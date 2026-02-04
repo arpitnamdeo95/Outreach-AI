@@ -801,7 +801,7 @@ const PricingPage = () => {
                         <span className="text-4xl font-bold text-white">$49</span><span className="text-slate-500 mb-1">/mo</span>
                     </div>
                     <p className="text-slate-400 text-sm mb-8">Perfect for solo founders validating their offer.</p>
-                    <button className="w-full py-3 rounded-lg border border-white/10 text-white font-bold hover:bg-white/5 transition-colors mb-8">Start Free Trial</button>
+                    <button onClick={() => navigate('/login')} className="w-full py-3 rounded-lg border border-white/10 text-white font-bold hover:bg-white/5 transition-colors mb-8">Get Started</button>
 
                     <div className="space-y-4">
                         {[
