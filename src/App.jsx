@@ -398,6 +398,7 @@ const DashboardPage = () => {
 };
 
 const HomePage = () => {
+    const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [status, setStatus] = useState('idle');
 
@@ -437,7 +438,7 @@ const HomePage = () => {
 
                     {/* CTAs */}
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4" data-aos="fade-up" data-aos-delay="300">
-                        <button className="px-8 py-4 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-lg hover:shadow-lg hover:shadow-purple-500/25 hover:scale-105 transition-all flex items-center gap-2">
+                        <button onClick={() => navigate('/login')} className="px-8 py-4 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-lg hover:shadow-lg hover:shadow-purple-500/25 hover:scale-105 transition-all flex items-center gap-2">
                             Get Early Access <ArrowRight size={18} />
                         </button>
                         <button className="px-8 py-4 rounded-full bg-white/5 border border-white/10 text-white font-medium text-lg hover:bg-white/10 transition-all flex items-center gap-2">
@@ -687,20 +688,12 @@ const HomePage = () => {
                     <h2 className="text-4xl sm:text-6xl font-bold text-white mb-6 tracking-tight">Stop chasing clients. <br /> Let them come to you.</h2>
                     <p className="text-xl text-slate-400 mb-10">Join the rigorous agencies automating their growth with Outrech.</p>
 
-                    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mb-6">
-                        <input
-                            type="email"
-                            placeholder="work@email.com"
-                            required
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="flex-1 bg-white/5 border border-white/10 rounded-full px-6 py-4 text-white focus:outline-none focus:border-purple-500 transition-colors"
-                        />
-                        <button disabled={status === 'submitting' || status === 'success'} className="bg-white text-[#0B0F1A] px-8 py-4 rounded-full font-bold hover:bg-slate-200 transition-colors shadow-lg shadow-white/10 whitespace-nowrap">
-                            {status === 'success' ? 'Access Granted' : 'Get Early Access'}
+                    <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mb-6">
+                        <button onClick={() => navigate('/login')} className="w-full bg-white text-[#0B0F1A] px-8 py-4 rounded-full font-bold hover:bg-slate-200 transition-colors shadow-lg shadow-white/10 whitespace-nowrap">
+                            Get Started Now
                         </button>
-                    </form>
-                    <div className="text-sm text-slate-600">No credit card required. 14-day free trial.</div>
+                    </div>
+                    <div className="text-sm text-slate-600">Secure access. Instant activation.</div>
                 </div>
             </section>
         </main>
@@ -1045,12 +1038,14 @@ const LoginPage = () => {
                     </button>
                 </form>
 
-                <div className="mt-8 text-center text-sm text-slate-500">
-                    {isSignUp ? (
-                        <>Already have an account? <button onClick={() => setIsSignUp(false)} className="text-white hover:underline">Sign In</button></>
-                    ) : (
-                        <>Don't have an account? <button onClick={() => setIsSignUp(true)} className="text-white hover:underline">Create an Account</button></>
-                    )}
+                <div className="mt-8 text-center text-sm border-t border-white/5 pt-6">
+                    <p className="text-slate-500 mb-2">{isSignUp ? 'Already have an account?' : "Don't have an account?"}</p>
+                    <button
+                        onClick={() => { setIsSignUp(!isSignUp); setError(null); setMessage(null); }}
+                        className="text-white font-bold hover:text-purple-400 transition-colors underline underline-offset-4"
+                    >
+                        {isSignUp ? 'Sign In' : 'Create an Account'}
+                    </button>
                 </div>
             </div>
         </div>
