@@ -779,6 +779,7 @@ const ResourcesPage = () => {
 };
 
 const PricingPage = () => {
+    const navigate = useNavigate();
     return (
         <div className="pt-32 pb-20 px-4 max-w-7xl mx-auto">
             <div className="text-center mb-16">
@@ -827,7 +828,7 @@ const PricingPage = () => {
                         <span className="text-5xl font-bold text-white">$99</span><span className="text-slate-500 mb-1">/mo</span>
                     </div>
                     <p className="text-slate-400 text-sm mb-8">For serious sellers scaling their pipeline.</p>
-                    <button className="w-full py-3 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold hover:shadow-lg hover:shadow-purple-500/25 transition-all mb-8">Get Started</button>
+                    <button onClick={() => navigate('/login')} className="w-full py-3 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold hover:shadow-lg hover:shadow-purple-500/25 transition-all mb-8">Get Started</button>
 
                     <div className="space-y-4">
                         {[
@@ -852,7 +853,7 @@ const PricingPage = () => {
                         <span className="text-4xl font-bold text-white">$249</span><span className="text-slate-500 mb-1">/mo</span>
                     </div>
                     <p className="text-slate-400 text-sm mb-8">White-label ready for lead gen agencies.</p>
-                    <button className="w-full py-3 rounded-lg border border-white/10 text-white font-bold hover:bg-white/5 transition-colors mb-8">Contact Sales</button>
+                    <button onClick={() => navigate('/login')} className="w-full py-3 rounded-lg border border-white/10 text-white font-bold hover:bg-white/5 transition-colors mb-8">Contact Sales</button>
 
                     <div className="space-y-4">
                         {[
@@ -871,7 +872,7 @@ const PricingPage = () => {
             </div>
 
             <div className="text-center mt-16 text-slate-500 text-sm">
-                <p>All plans include a 14-day free trial. No credit card required.</p>
+                <p>Get started today with our powerful LinkedIn sales system. No credit card required.</p>
                 <div className="flex items-center justify-center gap-4 mt-4">
                     <span className="flex items-center gap-1"><Shield size={14} /> 256-bit Encryption</span>
                     <span className="flex items-center gap-1"><Lock size={14} /> GDPR Compliant</span>
@@ -884,10 +885,13 @@ const PricingPage = () => {
 
 const LoginPage = () => {
     const navigate = useNavigate();
+    const [isSignUp, setIsSignUp] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [message, setMessage] = useState(null);
 
     const handleGoogleLogin = async () => {
         setLoading(true);
@@ -910,17 +914,34 @@ const LoginPage = () => {
         }
     };
 
-    const handleEmailLogin = async (e) => {
+    const handleAuth = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
+        setMessage(null);
+
         try {
-            const { error } = await supabase.auth.signInWithPassword({
-                email,
-                password,
-            });
-            if (error) throw error;
-            navigate('/dashboard');
+            if (isSignUp) {
+                const { error } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: {
+                            full_name: name,
+                        }
+                    }
+                });
+                if (error) throw error;
+                setMessage("Success! Please check your email to verify your account.");
+                setLoading(false);
+            } else {
+                const { error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password,
+                });
+                if (error) throw error;
+                navigate('/dashboard');
+            }
         } catch (error) {
             setError(error.message);
             setLoading(false);
@@ -937,8 +958,10 @@ const LoginPage = () => {
                     <div className="w-12 h-12 bg-gradient-to-tr from-purple-600 to-indigo-500 rounded-xl flex items-center justify-center text-white shadow-lg mx-auto mb-4">
                         <Rocket size={24} className="fill-white/20" />
                     </div>
-                    <h2 className="text-2xl font-bold text-white">Welcome back</h2>
-                    <p className="text-slate-400 text-sm mt-2">Enter your credentials to access the command center.</p>
+                    <h2 className="text-2xl font-bold text-white">{isSignUp ? 'Create your account' : 'Welcome back'}</h2>
+                    <p className="text-slate-400 text-sm mt-2">
+                        {isSignUp ? 'Join Outrech to start scaling your LinkedIn outreach.' : 'Enter your credentials to access the command center.'}
+                    </p>
                 </div>
 
                 {error && (
@@ -948,7 +971,27 @@ const LoginPage = () => {
                     </div>
                 )}
 
-                <form className="space-y-5" onSubmit={handleEmailLogin}>
+                {message && (
+                    <div className="mb-4 p-3 bg-green-500/10 border border-green-500/20 rounded-lg flex items-center gap-2 text-green-400 text-sm">
+                        <CheckCircle size={16} />
+                        {message}
+                    </div>
+                )}
+
+                <form className="space-y-5" onSubmit={handleAuth}>
+                    {isSignUp && (
+                        <div>
+                            <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Full Name</label>
+                            <input
+                                type="text"
+                                className="w-full bg-[#0F121C] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                                placeholder="Alex Founder"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                required={isSignUp}
+                            />
+                        </div>
+                    )}
                     <div>
                         <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Email Address</label>
                         <input
@@ -963,7 +1006,7 @@ const LoginPage = () => {
                     <div>
                         <div className="flex justify-between items-center mb-2">
                             <label className="block text-xs font-bold text-slate-400 uppercase">Password</label>
-                            <a href="#" className="text-xs text-purple-400 hover:text-purple-300">Forgot?</a>
+                            {!isSignUp && <a href="#" className="text-xs text-purple-400 hover:text-purple-300">Forgot?</a>}
                         </div>
                         <input
                             type="password"
@@ -975,13 +1018,15 @@ const LoginPage = () => {
                         />
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        <input type="checkbox" id="remember" className="rounded border-white/20 bg-white/5 text-purple-600 focus:ring-purple-600" />
-                        <label htmlFor="remember" className="text-sm text-slate-400 cursor-pointer">Keep me logged in</label>
-                    </div>
+                    {!isSignUp && (
+                        <div className="flex items-center gap-2">
+                            <input type="checkbox" id="remember" className="rounded border-white/20 bg-white/5 text-purple-600 focus:ring-purple-600" />
+                            <label htmlFor="remember" className="text-sm text-slate-400 cursor-pointer">Keep me logged in</label>
+                        </div>
+                    )}
 
                     <button disabled={loading} className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-lg hover:shadow-lg hover:shadow-purple-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                        {loading ? 'Signing In...' : 'Sign In'}
+                        {loading ? 'Processing...' : (isSignUp ? 'Create Account' : 'Sign In')}
                     </button>
 
                     <div className="relative my-6 text-center">
@@ -1001,7 +1046,11 @@ const LoginPage = () => {
                 </form>
 
                 <div className="mt-8 text-center text-sm text-slate-500">
-                    Don't have an account? <Link to="/pricing" className="text-white hover:underline">Start Free Trial</Link>
+                    {isSignUp ? (
+                        <>Already have an account? <button onClick={() => setIsSignUp(false)} className="text-white hover:underline">Sign In</button></>
+                    ) : (
+                        <>Don't have an account? <button onClick={() => setIsSignUp(true)} className="text-white hover:underline">Create an Account</button></>
+                    )}
                 </div>
             </div>
         </div>
